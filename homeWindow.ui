@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HomeWindow</class>
+ <widget class="QMainWindow" name="HomeWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>597</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>6</x>
+      <y>30</y>
+      <width>791</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>22</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>SMS Book Keeping System</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>240</y>
+      <width>801</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="leftMargin">
+      <number>170</number>
+     </property>
+     <property name="rightMargin">
+      <number>170</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="sellButton">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #4d4d4d;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+QPushButton:hover {
+    background-color: #595959;
+}
+
+QPushButton:pressed {
+    background-color: #3d3d3d;
+}</string>
+       </property>
+       <property name="text">
+        <string>Sell - فروش</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="InvoiceButton">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #4d4d4d;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 20px;
+
+}
+
+QPushButton:hover {
+    background-color: #595959;
+}
+
+QPushButton:pressed {
+    background-color: #3d3d3d;
+}</string>
+       </property>
+       <property name="text">
+        <string>Invoice - انوایس</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMore">
+    <property name="title">
+     <string>More</string>
+    </property>
+    <addaction name="actionSell"/>
+    <addaction name="actionInvoice"/>
+    <addaction name="actionReceipt"/>
+    <addaction name="actionCustomer"/>
+    <addaction name="actionProducts"/>
+    <addaction name="separator"/>
+    <addaction name="actionconfig"/>
+    <addaction name="actionAbout"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuMore"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionSell">
+   <property name="text">
+    <string>Sell</string>
+   </property>
+  </action>
+  <action name="actionInvoice">
+   <property name="text">
+    <string>Invoice</string>
+   </property>
+  </action>
+  <action name="actionReceipt">
+   <property name="text">
+    <string>Receipt</string>
+   </property>
+  </action>
+  <action name="actionCustomer">
+   <property name="text">
+    <string>Customer</string>
+   </property>
+  </action>
+  <action name="actionconfig">
+   <property name="text">
+    <string>Config</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionProducts">
+   <property name="text">
+    <string>Products</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
