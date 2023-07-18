@@ -58,3 +58,6 @@ class Customer:
             "UPDATE customers SET name = %s, address = %s, ph_num = %s WHERE id = %s",
             (self.name, self.address, self.ph, self.id)
         )
+
+    def is_empty(self):
+        return self == Customer(None, None, None, None)

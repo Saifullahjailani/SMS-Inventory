@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import reportlab.lib.pagesizes
 # Form implementation generated from reading ui file 'receiptWindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
@@ -9,49 +9,55 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from uuid import uuid4
+from tableModel import CustomTableModel
+from PyQt5.QtCore import QStringListModel
+import logic.product
+import stylesheet
+from logic.generate_pdf import generate_receipt
+import logic.sales
 
 
-class ReciptWindow(object):
-    def setupUi(self, ReciptWindow):
-        ReciptWindow.setObjectName("ReciptWindow")
-        ReciptWindow.resize(1133, 866)
-        self.centralwidget = QtWidgets.QWidget(ReciptWindow)
+class ReceiptWindow(object):
+    def __init__(self, data, customer):
+        self.data = data
+        self.id = uuid4()
+        self.customer = customer
+        data.db.connect()
+        self.product_dic = {x[0]: x for x in logic.product.Product.get_star(data.db)}
+        data.db.disconnect()
+        self.store = set()  # {'product_key' ==> ReceiptObject}
+        self.total_val = 0
+        self.disc_total_val = 0.0
+        self.row_index = None
+
+    def setupUi(self, ReceiptWindow):
+        ReceiptWindow.setObjectName("ReciptWindow")
+        ReceiptWindow.resize(1133, 866)
+        self.centralwidget = QtWidgets.QWidget(ReceiptWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.customersTable = QtWidgets.QTableView(self.centralwidget)
         self.customersTable.setGeometry(QtCore.QRect(10, 50, 811, 761))
-        self.customersTable.setStyleSheet("QTableWidget::item {\n"
-                                          "    background-color: #f0f0f0; /* Set the default background color for table items */\n"
-                                          "}\n"
-                                          "\n"
-                                          "QTableWidget::item:nth-child(even) {\n"
-                                          "    background-color: #ffffff; /* Set the background color for even rows */\n"
-                                          "}\n"
-                                          "\n"
-                                          "QTableWidget::item:hover {\n"
-                                          "    background-color: #c0c0c0; /* Set the background color for hovered items */\n"
-                                          "}")
+        self.customersTable.setStyleSheet(stylesheet.TABLE_STYLE)
         self.customersTable.setAlternatingRowColors(True)
         self.customersTable.setObjectName("customersTable")
+        headers = ['Product ID', 'Product Name', 'Unit Price', 'Quantity', 'Discount%', 'Discounted Price',
+                   'Total Price']
+        model = CustomTableModel([], headers)
+        self.customersTable.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.customersTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        self.customersTable.setSelectionMode(QtWidgets.QTableView.SingleSelection)
+        self.customersTable.setModel(model)
+        self.scroll_area = QtWidgets.QScrollArea(self.centralwidget)
+        self.scroll_area.setWidget(self.customersTable)
+        self.scroll_area.setGeometry(QtCore.QRect(10, 50, 811, 761))
+        self.customersTable.selectionModel().selectionChanged.connect(self.row_selected)
         self.backButton = QtWidgets.QPushButton(self.centralwidget)
         self.backButton.setGeometry(QtCore.QRect(870, 760, 221, 41))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.backButton.setFont(font)
-        self.backButton.setStyleSheet("QPushButton {\n"
-                                      "    background-color: #4d4d4d;\n"
-                                      "    color: #ffffff;\n"
-                                      "    padding: 8px 16px;\n"
-                                      "    border-radius: 20px;\n"
-                                      "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n"
-                                      "}\n"
-                                      "\n"
-                                      "QPushButton:hover {\n"
-                                      "    background-color: #595959;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QPushButton:pressed {\n"
-                                      "    background-color: #3d3d3d;\n"
-                                      "}")
+        self.backButton.setStyleSheet(stylesheet.BUTTON_STYLE)
         self.backButton.setObjectName("backButton")
         self.layoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.layoutWidget.setGeometry(QtCore.QRect(820, 50, 301, 201))
@@ -64,77 +70,50 @@ class ReciptWindow(object):
         self.verticalLayout_2.setContentsMargins(0, 0, -1, -1)
         self.verticalLayout_2.setSpacing(6)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.label_4 = QtWidgets.QLabel(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.label_4.setFont(font)
-        self.label_4.setObjectName("label_4")
-        self.verticalLayout_2.addWidget(self.label_4)
         self.product = QtWidgets.QComboBox(self.layoutWidget)
         self.product.setObjectName("product")
+        self.product.setStyleSheet(stylesheet.COMBOX_BOX_STYLE)
+        model = QStringListModel(self.product_dic.keys())
+        self.product.setModel(model)
         self.verticalLayout_2.addWidget(self.product)
         self.verticalLayout.addLayout(self.verticalLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label_2 = QtWidgets.QLabel(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(16)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout.addWidget(self.label_2)
-        self.spinBox = QtWidgets.QSpinBox(self.layoutWidget)
-        self.spinBox.setObjectName("spinBox")
-        self.horizontalLayout.addWidget(self.spinBox)
+        self.quantity_val = QtWidgets.QSpinBox(self.layoutWidget)
+        self.quantity_val.setObjectName("spinBox")
+        self.horizontalLayout.addWidget(self.quantity_val)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_3 = QtWidgets.QLabel(self.layoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(16)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
-        self.doubleSpinBox = QtWidgets.QDoubleSpinBox(self.layoutWidget)
-        self.doubleSpinBox.setObjectName("doubleSpinBox")
-        self.horizontalLayout_2.addWidget(self.doubleSpinBox)
+        self.discount_val = QtWidgets.QDoubleSpinBox(self.layoutWidget)
+        self.discount_val.setObjectName("doubleSpinBox")
+        self.horizontalLayout_2.addWidget(self.discount_val)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.generateReceipt = QtWidgets.QPushButton(self.centralwidget)
         self.generateReceipt.setGeometry(QtCore.QRect(870, 700, 221, 41))
-        font = QtGui.QFont()
-        font.setPointSize(16)
         self.generateReceipt.setFont(font)
-        self.generateReceipt.setStyleSheet("QPushButton {\n"
-                                           "    background-color: #4d4d4d;\n"
-                                           "    color: #ffffff;\n"
-                                           "    padding: 8px 16px;\n"
-                                           "    border-radius: 20px;\n"
-                                           "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n"
-                                           "}\n"
-                                           "\n"
-                                           "QPushButton:hover {\n"
-                                           "    background-color: #595959;\n"
-                                           "}\n"
-                                           "\n"
-                                           "QPushButton:pressed {\n"
-                                           "    background-color: #3d3d3d;\n"
-                                           "}")
+        self.generateReceipt.setStyleSheet(stylesheet.BUTTON_STYLE)
         self.generateReceipt.setObjectName("generateReceipt")
         self.customeLabel = QtWidgets.QLabel(self.centralwidget)
         self.customeLabel.setGeometry(QtCore.QRect(10, 0, 81, 34))
-        font = QtGui.QFont()
         font.setPointSize(12)
         self.customeLabel.setFont(font)
         self.customeLabel.setObjectName("customeLabel")
         self.receipt_id = QtWidgets.QLabel(self.centralwidget)
         self.receipt_id.setGeometry(QtCore.QRect(100, 0, 721, 34))
-        font = QtGui.QFont()
-        font.setPointSize(12)
         self.receipt_id.setFont(font)
         self.receipt_id.setText("")
         self.receipt_id.setObjectName("receipt_id")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(830, 540, 101, 20))
-        font = QtGui.QFont()
         font.setPointSize(10)
         self.label.setFont(font)
         self.label.setObjectName("label")
@@ -145,30 +124,22 @@ class ReciptWindow(object):
         self.line.setObjectName("line")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(830, 565, 101, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
         self.label_5.setFont(font)
         self.label_5.setObjectName("label_5")
-        self.label_6 = QtWidgets.QLabel(self.centralwidget)
-        self.label_6.setGeometry(QtCore.QRect(960, 540, 161, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label_6.setFont(font)
-        self.label_6.setText("")
-        self.label_6.setWordWrap(True)
-        self.label_6.setObjectName("label_6")
+        self.customer_name = QtWidgets.QLabel(self.centralwidget)
+        self.customer_name.setGeometry(QtCore.QRect(960, 540, 161, 20))
+        self.customer_name.setFont(font)
+        self.customer_name.setText("")
+        self.customer_name.setWordWrap(True)
+        self.customer_name.setObjectName("label_6")
         self.customerPh = QtWidgets.QLabel(self.centralwidget)
         self.customerPh.setGeometry(QtCore.QRect(960, 565, 161, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
         self.customerPh.setFont(font)
         self.customerPh.setText("")
         self.customerPh.setWordWrap(True)
         self.customerPh.setObjectName("customerPh")
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(830, 490, 101, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
         self.line_2 = QtWidgets.QFrame(self.centralwidget)
@@ -178,22 +149,16 @@ class ReciptWindow(object):
         self.line_2.setObjectName("line_2")
         self.rawTotal = QtWidgets.QLabel(self.centralwidget)
         self.rawTotal.setGeometry(QtCore.QRect(960, 465, 161, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
         self.rawTotal.setFont(font)
         self.rawTotal.setText("")
         self.rawTotal.setWordWrap(True)
         self.rawTotal.setObjectName("rawTotal")
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
         self.label_9.setGeometry(QtCore.QRect(830, 465, 101, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
         self.label_9.setFont(font)
         self.label_9.setObjectName("label_9")
         self.discountedTotal = QtWidgets.QLabel(self.centralwidget)
         self.discountedTotal.setGeometry(QtCore.QRect(960, 490, 161, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
         self.discountedTotal.setFont(font)
         self.discountedTotal.setText("")
         self.discountedTotal.setWordWrap(True)
@@ -204,65 +169,158 @@ class ReciptWindow(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget)
         self.horizontalLayout_3.setContentsMargins(50, 0, 50, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.addButton_2 = QtWidgets.QPushButton(self.widget)
-        font = QtGui.QFont()
+        self.remove_button = QtWidgets.QPushButton(self.widget)
+        self.line_3 = QtWidgets.QFrame(self.centralwidget)
+        self.line_3.setGeometry(QtCore.QRect(930, 380, 20, 72))
+        self.line_3.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_3.setObjectName("line_3")
+        self.label_10 = QtWidgets.QLabel(self.centralwidget)
+        self.label_10.setGeometry(QtCore.QRect(830, 405, 101, 20))
+        self.label_10.setFont(font)
+        self.label_10.setText("Disc Price:")
+        self.label_10.setWordWrap(True)
+
+        self.label_13 = QtWidgets.QLabel(self.centralwidget)
+        self.label_13.setGeometry(QtCore.QRect(830, 430, 101, 20))
+        self.label_13.setFont(font)
+        self.label_13.setText("Product Total:")
+        self.label_13.setWordWrap(True)
+
+        self.quant_label = QtWidgets.QLabel(self.centralwidget)
+        self.quant_label.setGeometry(QtCore.QRect(960, 430, 101, 20))
+        self.quant_label.setFont(font)
+        self.quant_label.setText("")
+        self.quant_label.setWordWrap(True)
+
+        self.label_11 = QtWidgets.QLabel(self.centralwidget)
+        self.label_11.setGeometry(QtCore.QRect(830, 380, 101, 20))
+        self.label_11.setFont(font)
+        self.label_11.setText("Raw Price:")
+        self.label_11.setWordWrap(True)
+        self.price = QtWidgets.QLabel(self.centralwidget)
+        self.price.setGeometry(QtCore.QRect(960, 380, 101, 20))
+        self.price.setFont(font)
+        self.price.setText("")
+        self.price.setWordWrap(True)
+        self.disc_price = QtWidgets.QLabel(self.centralwidget)
+        self.disc_price.setGeometry(QtCore.QRect(960, 405, 101, 20))
+        self.disc_price.setFont(font)
+        self.disc_price.setText("")
+        self.disc_price.setWordWrap(True)
         font.setPointSize(16)
-        self.addButton_2.setFont(font)
-        self.addButton_2.setStyleSheet("QPushButton {\n"
-                                       "    background-color: #4d4d4d;\n"
-                                       "    color: #ffffff;\n"
-                                       "    padding: 8px 16px;\n"
-                                       "    border-radius: 20px;\n"
-                                       "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n"
-                                       "}\n"
-                                       "\n"
-                                       "QPushButton:hover {\n"
-                                       "    background-color: #595959;\n"
-                                       "}\n"
-                                       "\n"
-                                       "QPushButton:pressed {\n"
-                                       "    background-color: #3d3d3d;\n"
-                                       "}")
-        self.addButton_2.setObjectName("addButton_2")
-        self.horizontalLayout_3.addWidget(self.addButton_2)
-        self.addButton = QtWidgets.QPushButton(self.widget)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.addButton.setFont(font)
-        self.addButton.setStyleSheet("QPushButton {\n"
-                                     "    background-color: #4d4d4d;\n"
-                                     "    color: #ffffff;\n"
-                                     "    padding: 8px 16px;\n"
-                                     "    border-radius: 20px;\n"
-                                     "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n"
-                                     "}\n"
-                                     "\n"
-                                     "QPushButton:hover {\n"
-                                     "    background-color: #595959;\n"
-                                     "}\n"
-                                     "\n"
-                                     "QPushButton:pressed {\n"
-                                     "    background-color: #3d3d3d;\n"
-                                     "}")
-        self.addButton.setObjectName("addButton")
-        self.horizontalLayout_3.addWidget(self.addButton)
-        ReciptWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(ReciptWindow)
+        self.remove_button.setFont(font)
+        self.remove_button.setStyleSheet(stylesheet.BUTTON_STYLE)
+        self.remove_button.setObjectName("addButton_2")
+        self.horizontalLayout_3.addWidget(self.remove_button)
+        self.add_button = QtWidgets.QPushButton(self.widget)
+        self.add_button.setFont(font)
+        self.add_button.setStyleSheet(stylesheet.BUTTON_STYLE)
+        self.add_button.setObjectName("addButton")
+        self.horizontalLayout_3.addWidget(self.add_button)
+        ReceiptWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(ReceiptWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1133, 21))
         self.menubar.setObjectName("menubar")
-        ReciptWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(ReciptWindow)
+        ReceiptWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(ReceiptWindow)
         self.statusbar.setObjectName("statusbar")
-        ReciptWindow.setStatusBar(self.statusbar)
+        ReceiptWindow.setStatusBar(self.statusbar)
+        self.retranslateUi(ReceiptWindow)
+        QtCore.QMetaObject.connectSlotsByName(ReceiptWindow)
+        self.receipt_id.setText(str(self.id.hex))
+        self.customerPh.setText(self.customer.ph)
+        self.customer_name.setText(self.customer.name)
+        self.rawTotal.setText("0.00")
+        self.discountedTotal.setText("0.00")
+        self.quantity_val.setMinimum(1)
+        self.discount_val.setMaximum(100)
+        self.changed(self.product.currentText())
+        self.product.currentIndexChanged.connect(lambda: self.prod_changed())
+        self.discount_val.valueChanged.connect(lambda: self.changed(self.product.currentText()))
+        self.quantity_val.valueChanged.connect(lambda: self.changed(self.product.currentText()))
+        self.add_button.clicked.connect(self.add)
+        self.remove_button.clicked.connect(self.remove)
+        self.backButton.clicked.connect(lambda: self.data.draw(self.data.customerWindow))
+        self.generateReceipt.clicked.connect(self.generate_receipt)
 
-        self.retranslateUi(ReciptWindow)
-        QtCore.QMetaObject.connectSlotsByName(ReciptWindow)
+    def prod_changed(self):
+        id = self.product.currentText()
+        if id in self.store:
+            pass
+        else:
+            self.discount_val.setValue(0.00)
+            self.quantity_val.setValue(1)
+        self.changed(id)
+
+    def changed(self, id, q=None, d=None, index=None):
+        if id:
+            price = self.product_dic[id][2]
+            if index is not None:
+                self.product.setCurrentIndex(index)
+            if q is not None:
+                self.quantity_val.setValue(int(q))
+            if d is not None:
+                self.discount_val.setValue(d)
+            discount = float(self.discount_val.value())
+            quantity = int(self.quantity_val.value())
+            disc_total = price * (100 - discount) / 100
+            self.price.setText(str(price))
+            self.disc_price.setText(str(round(disc_total, 2)))
+            self.quant_label.setText(str(round(disc_total * quantity, 2)))
+
+            self.price.repaint()
+            self.disc_price.repaint()
+            self.quant_label.repaint()
+
+    def row_selected(self, selected, deselected):
+        selected_row = selected.indexes()
+        self.row_index = selected_row[0]
+        id, _, _, quantity, discount, _, _ = self.customersTable.model().get_item(self.row_index)
+        index = list(self.product_dic.keys()).index(id)
+        self.changed(id, quantity, discount, index)
+
+    def add(self):
+        id = self.product.currentText()
+        model = self.customersTable.model()
+        name = self.product_dic[id][1]
+        unit_price = float(self.price.text())
+        quantity = int(self.quantity_val.value())
+        discounted_price = float(self.disc_price.text())
+        discount = self.discount_val.value()
+        total = float(self.quant_label.text())
+        row = (id, name, unit_price, quantity, discount, discounted_price, total)
+
+        if id in self.store:
+            index = model.find(id)
+            model.set(row, index)
+        else:
+            model.add_row(row)
+            self.store.add(id)
+        self.recalculate()
+
+    def remove(self):
+        id = self.product.currentText()
+        if id not in self.store:
+            return
+        model = self.customersTable.model()
+        model.delete(id)
+        self.store.remove(id)
+        self.recalculate()
+
+    def recalculate(self):
+        model = self.customersTable.model()
+        sum_total = model.sum_col(6)
+        disc_total = model.sum_col(5)
+        self.rawTotal.setText(str(sum_total()))
+        self.discountedTotal.setText(str(disc_total()))
+        self.rawTotal.repaint()
+        self.discountedTotal.repaint()
 
     def retranslateUi(self, ReciptWindow):
         _translate = QtCore.QCoreApplication.translate
         ReciptWindow.setWindowTitle(_translate("ReciptWindow", "MainWindow"))
         self.backButton.setText(_translate("ReciptWindow", "Back"))
-        self.label_4.setText(_translate("ReciptWindow", "Product:"))
         self.label_2.setText(_translate("ReciptWindow", "Ammount:"))
         self.label_3.setText(_translate("ReciptWindow", "Discount%:"))
         self.generateReceipt.setText(_translate("ReciptWindow", "Generate Receipt"))
@@ -271,5 +329,17 @@ class ReciptWindow(object):
         self.label_5.setText(_translate("ReciptWindow", "Customer ph#:"))
         self.label_7.setText(_translate("ReciptWindow", "Discounted Total:"))
         self.label_9.setText(_translate("ReciptWindow", "Raw Total:"))
-        self.addButton_2.setText(_translate("ReciptWindow", "-"))
-        self.addButton.setText(_translate("ReciptWindow", "+"))
+        self.remove_button.setText(_translate("ReciptWindow", "-"))
+        self.add_button.setText(_translate("ReciptWindow", "+"))
+
+    def generate_receipt(self):
+        self.data.db.connect()
+        for row in self.customersTable.model()._data:
+            product_id, product_name, price, quantity, discount, discounted_price, total_price = row
+            record = logic.sales.Sales(None, str(self.id.hex), quantity, product_id, self.customer.id, discount, discounted_price, self.data.db)
+            record.sell()
+        self.data.db.commit()
+        self.data.db.disconnect()
+        generate_receipt('receipt.pdf', self.id, self.customer, self.customersTable.model()._data,
+                         self.rawTotal.text(), self.discountedTotal.text(), True)
+

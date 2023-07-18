@@ -11,6 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import addCustomerWindowGui
 import logic.customer
+import receiptWindowGui
 from tableModel import CustomTableModel
 
 TABLE_STYLE = "QTableWidget::item {\n" \
@@ -154,9 +155,9 @@ class CustomerWindow(object):
         self.searchButton.clicked.connect(lambda: self.search())
         self.is_ph.setChecked(True)
 
-        self.customers_list = []
+        customers_list = []
         headers = ['ID', 'Name', 'Address', 'Ph#']
-        model = CustomTableModel(self.customers_list, headers)
+        model = CustomTableModel(customers_list, headers)
         self.customersTable.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.customersTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.customersTable.setSelectionMode(QtWidgets.QTableView.SingleSelection)
@@ -167,6 +168,7 @@ class CustomerWindow(object):
         self.customersTable.selectionModel().selectionChanged.connect(self.row_selected)
         self.editCustomerButton.clicked.connect(self.edit)
 
+        self.generateReceiptButton.clicked.connect(self.gen_receipt)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -178,16 +180,23 @@ class CustomerWindow(object):
         self.editCustomerButton.setText(_translate("MainWindow", "Edit Customer"))
         self.generateReceiptButton.setText(_translate("MainWindow", "Generate Receipt"))
 
+    def gen_receipt(self):
+        if not self.selected_row:
+            return
+        row = self.selected_row[0]
+        id, name, address, ph_num = self.customersTable.model().get_item(row)
+        customer = logic.customer.Customer(id, name, address, ph_num)
+        receipt = receiptWindowGui.ReceiptWindow(self.data, customer)
+        self.data.draw(receipt)
     def search(self):
         key = self.search_key.text().strip()
-        self.customers_list = []
+        model = self.customersTable.model()
+        model.clear()
         if key == "":
             return
         while not self.data.db.connect():
             self.data.db.connect()
-
-        self.customersTable.model()._data = logic.customer.Customer.fetch(self.data.db, key, self.is_ph.isChecked())
-        self.customersTable.model().layoutChanged.emit()
+        model.change_data(logic.customer.Customer.fetch(self.data.db, key, self.is_ph.isChecked()))
         self.data.db.disconnect()
 
 
@@ -226,8 +235,8 @@ class CustomerWindow(object):
         if not self.selected_row:
             return
         row = self.selected_row[0]
-        index = row.row()
-        c = self.customersTable.model()._data[index]
-        # customer = logic.customer.Customer(id, name, address, ph)
-        # edit_window = addCustomerWindowGui.AddCustomer(self.data, customer)
-        # self.data.draw(edit_window)
+        id, name, address, ph_num = self.customersTable.model().get_item(row)
+        customer = logic.customer.Customer(id, name, address, ph_num)
+
+        edit_window = addCustomerWindowGui.AddCustomer(self.data, customer)
+        self.data.draw(edit_window)

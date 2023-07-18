@@ -38,7 +38,7 @@ TEXT_BOX_STYLE = "QLineEdit {\n" \
 
 
 class AddCustomer(object):
-    def __init__(self, data, customer=None):
+    def __init__(self, data, customer=logic.customer.Customer(None, None, None, None)):
         self.data = data
         self.customer = customer
 
@@ -116,7 +116,7 @@ class AddCustomer(object):
         self.addCustomerButton.clicked.connect(lambda: self.add_product())
         self.backButton.clicked.connect(lambda : self.data.draw(self.data.customerWindow))
 
-        if self.customer:
+        if not self.customer.is_empty():
             self.name.setText(self.customer.name)
             self.address.setText(self.customer.address)
             self.ph_num.setText(self.customer.ph)
@@ -128,7 +128,7 @@ class AddCustomer(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "Add Customer"))
         self.name.setPlaceholderText(_translate("MainWindow", "Enter the name   -   اسم مشتری"))
         self.backButton.setText(_translate("MainWindow", "Back"))
-        btn_name = "Edit Customer" if self.customer else "Add Customer"
+        btn_name = "Add Customer" if self.customer.is_empty() else "Edit Customer"
         self.addCustomerButton.setText(_translate("MainWindow", btn_name))
         self.address.setPlaceholderText(_translate("MainWindow", "Enter the address   -   آدرس مشتری"))
         self.ph_num.setPlaceholderText(_translate("MainWindow", "Enter the ph#   -   شماره تماس مشتری"))
@@ -148,7 +148,7 @@ class AddCustomer(object):
         if customer == self.customer:
             return
         self.data.db.connect()
-        if self.customer:
+        if not self.customer.is_empty():
             if not self.customer.edit(self.data.db, customer):
                 self.errorLog.setText("Can not edit this Customer")
         else:

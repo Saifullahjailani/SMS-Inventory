@@ -1,10 +1,7 @@
-from db import DB
-
-
 class Sales:
-    def __init__(self, id, date_sold, receipt_id, quantity, product_id, customer_id, discount=0,db:DB=None):
+    def __init__(self, id, receipt_id, quantity, product_id, customer_id, discount=0, discounted_price=0, db=None):
+        self.discounted_price = discounted_price
         self.id = id
-        self.date_sold = date_sold
         self.receipt_id = receipt_id
         self.quantity = quantity
         self.product_id = product_id
@@ -14,8 +11,8 @@ class Sales:
 
     
     def sell(self):
-        query = "INSERT INTO sales (receipt_id, quantity, product_id, customer_id, discount) VALUES (%s, %s, %s, %s,%f );"
-        return self.db.push(query, self.receipt_id, self.quantity, self.product_id, self.customer_id, self.discount)
+        query = "INSERT INTO sales (receipt_id, quantity, product_id, customer_id, discount, discounted_price) VALUES (%s, %s, %s, %s,%s, %s );"
+        return self.db.push(query, (self.receipt_id, self.quantity, self.product_id, self.customer_id, self.discount, self.discounted_price))
     
     def remove(self):
         query = f"DELETE FROM sales WHERE receipt_id = {self.receipt_id} AND product_id = {self.product_id};"
@@ -27,4 +24,4 @@ class Sales:
     
     def fetch(self, receiptID):
         query = "SELECT * FROM sales WHERE receipt_id = %s;"
-        return [Sales(x[0], x[1], x[2], x[3], x[4],x[5],x[6]) for x in self.db.fetchall(query, receiptID)]
+        return self.db.fetchall(query, receiptID)

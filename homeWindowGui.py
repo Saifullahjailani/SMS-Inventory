@@ -89,8 +89,6 @@ class HomeWindow(object):
         self.actionInvoice.setObjectName("actionInvoice")
         self.actionReceipt = QtWidgets.QAction(HomeWindow)
         self.actionReceipt.setObjectName("actionReceipt")
-        self.actionCustomer = QtWidgets.QAction(HomeWindow)
-        self.actionCustomer.setObjectName("actionCustomer")
         self.actionconfig = QtWidgets.QAction(HomeWindow)
         self.actionconfig.setObjectName("actionconfig")
         self.actionAbout = QtWidgets.QAction(HomeWindow)
@@ -104,7 +102,6 @@ class HomeWindow(object):
         self.menuMore.addAction(self.actionSell)
         self.menuMore.addAction(self.actionInvoice)
         self.menuMore.addAction(self.actionReceipt)
-        self.menuMore.addAction(self.actionCustomer)
         self.menuMore.addAction(self.actionProduct)
         self.menuMore.addSeparator()
         self.menuMore.addAction(self.actionconfig)
@@ -116,7 +113,8 @@ class HomeWindow(object):
         self.retranslateUi(HomeWindow)
         QtCore.QMetaObject.connectSlotsByName(HomeWindow)
 
-        self.actionCustomer.triggered.connect(lambda: self.data.draw(self.data.customerWindow))
+        self.actionSell.triggered.connect(lambda: self.data.draw(self.data.customerWindow))
+        self.sellButton.clicked.connect(lambda: self.data.draw(self.data.customerWindow))
         self.actionProduct.triggered.connect(lambda: self.data.draw(self.data.productsWindow))
     def retranslateUi(self, HomeWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -128,7 +126,6 @@ class HomeWindow(object):
         self.actionSell.setText(_translate("HomeWindow", "Sell"))
         self.actionInvoice.setText(_translate("HomeWindow", "Invoices"))
         self.actionReceipt.setText(_translate("HomeWindow", "Receipts"))
-        self.actionCustomer.setText(_translate("HomeWindow", "Customers"))
         self.actionProduct.setText(_translate("HomeWindow", "Products"))
         self.actionconfig.setText(_translate("HomeWindow", "Config"))
         self.actionAbout.setText(_translate("HomeWindow", "About"))

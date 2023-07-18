@@ -14,9 +14,10 @@ CREATE TABLE IF NOT EXISTS customers(
 CREATE TABLE IF NOT EXISTS sales (
     id BIGSERIAL PRIMARY KEY,
     date_sold TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    receipt_id UUID,
+    receipt_id TEXT,
     quantity INTEGER NOT NULL CHECK(quantity >= 0),
     product_id TEXT REFERENCES products (id),
     customer_id BIGINT REFERENCES customers (id),
-    discount FLOAT8
+    discount FLOAT8,
+    discounted_price FLOAT8 NOT NULL CHECK(quantity >= 0)
 );

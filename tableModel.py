@@ -34,7 +34,7 @@ class CustomTableModel(QAbstractTableModel):
 
         return None
 
-    def addRow(self, row_data):
+    def add_row(self, row_data):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._data.append(row_data)
         self.endInsertRows()
@@ -43,5 +43,49 @@ class CustomTableModel(QAbstractTableModel):
         return len(self._data) == 0
 
     def get_item(self, index):
-        index = index.index()
-        return self._data[index]
+        r = index.row()
+        return self._data[r]
+
+    def clear(self):
+        self._data = []
+        self.layoutChanged.emit()
+
+    def change_data(self, data):
+        self._data = data
+        self.layoutChanged.emit()
+
+    def re_draw(self):
+        self.layoutChanged.emit()
+
+    def delete(self, id):
+        ids = [x[0] for x in self._data]
+        index = ids.index(id)
+        self.pop(index)
+
+    def pop(self,idx):
+        self.beginRemoveRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._data.pop(idx)
+        self.endRemoveRows()
+        self.layoutChanged.emit()
+
+    def find(self, id):
+        ids = [x[0] for x in self._data]
+        if id in ids:
+            return ids.index(id)
+        return -1
+    def sum_col(self, col):
+        def sum_():
+            total = 0
+            for row in self._data:
+                total += row[col]
+            return round(total,2)
+
+        return sum_
+
+    def set(self, row, index):
+        self._data[index] = row
+        self.layoutChanged.emit()
+
+    def get_index(self, id):
+        ids = [x[0] for x in self._data]
+        return ids.index(id)
