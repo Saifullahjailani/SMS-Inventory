@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os.path
+
 import reportlab.lib.pagesizes
 # Form implementation generated from reading ui file 'receiptWindow.ui'
 #
@@ -340,5 +342,6 @@ class ReceiptWindow(object):
             record.sell()
         self.data.db.commit()
         self.data.db.disconnect()
-        generate_receipt('receipt.pdf', self.id.hex, self.customer, self.customersTable.model()._data,self.rawTotal.text(), True)
+        path = os.path.join(self.data.receipts_path, str(self.id.hex))
+        generate_receipt(str(path), self.id.hex, self.customer, self.customersTable.model()._data,self.rawTotal.text(), True)
         self.data.draw(self.data.homeWindow)

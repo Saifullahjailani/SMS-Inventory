@@ -56,6 +56,9 @@ if __name__ == '__main__':
         config = show_config()
     data = Data(app)
     data.db = logic.db.DB(config.db_name, config.db_user, config.db_password, config.db_host, config.db_port)
+    if not data.db.connect():
+        config = show_config()
+        data.db = logic.db.DB(config.db_name, config.db_user, config.db_password, config.db_host, config.db_port)
     data.db.disconnect()
     data.receipts_path = config.receipts_dir
     try:

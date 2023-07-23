@@ -12,11 +12,14 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from datetime import date
 
 def generate_receipt(pdf_file:str, receipt_id:str, customer, data:list, raw_total:str, auto_open=False, c_date=None):
+    if os.path.exists(pdf_file):
+        os.remove(pdf_file)
+
     doc = SimpleDocTemplate(pdf_file, pagesize=letter)
     # Create a list to hold the content of the receipt
     story = []
 
-    path = os.path.join(os.path.join(os.getcwd(),'logic'), 'logo.jpg')
+    path = os.path.join(os.path.join(os.getcwd(),'assets'), 'logo.jpg')
     # Logo
     logo = Image(path, 200, 100)
     story.append(logo)

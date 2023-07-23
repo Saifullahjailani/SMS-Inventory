@@ -114,6 +114,14 @@ class Dialog(QtWidgets.QDialog):
         buttonBox.accepted.connect(self.accept)
         self.retranslateUi(self)
         QtCore.QMetaObject.connectSlotsByName(self)
+        conf = config.read()
+        if conf is not None:
+            self.db_name.setText(conf.db_name)
+            self.db_port.setText(str(conf.db_port))
+            self.db_host.setText(conf.db_host)
+            self.db_password.setText(conf.db_password)
+            self.db_user_name.setText(conf.db_user)
+            self.rec_path.setText(conf.receipts_dir)
 
     def set_path(self)->None:
         fname = QtWidgets.QFileDialog.getExistingDirectory()

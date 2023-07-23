@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 
 # Form implementation generated from reading ui file 'customerWindow.ui'
 #
@@ -12,15 +13,19 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import addCustomerWindowGui
 import logic.customer
 import receiptWindowGui
+import receipt_show
+import stylesheet
+from logic import sales
 from tableModel import CustomTableModel
 from stylesheet import *
 
 
 class CustomerWindow(object):
-    def __init__(self, data):
+    def __init__(self, data, receipt_mode=False, key=None):
         self.data = data
         self.selected_row = []
-
+        self.receipt_mode = receipt_mode
+        self.key = key
     def setupUi(self, MainWindow, logic=None):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 597)
@@ -118,8 +123,26 @@ class CustomerWindow(object):
         self.scroll_area.setGeometry(QtCore.QRect(10, 10, 781, 271))
         self.customersTable.selectionModel().selectionChanged.connect(self.row_selected)
         self.editCustomerButton.clicked.connect(self.edit)
-
         self.generateReceiptButton.clicked.connect(self.gen_receipt)
+
+        if self.receipt_mode:
+            self.editCustomerButton.hide()
+            self.newCustomerButton.hide()
+            self.generateReceiptButton.clicked.connect(self.recipts)
+            self.search_key.setText(self.key)
+
+    def recipts(self):
+        if not self.selected_row:
+            return
+        row = self.selected_row[0]
+        id, name, address, ph_num = self.customersTable.model().get_item(row)
+        customer = logic.customer.Customer(id, name, address, ph_num)
+        while True:
+            if self.data.db.connect():
+                break
+        records = sales.Sales.fetch_with_customer(id, self.data.db)
+        r = receipt_show.ReciptShow(self.data, records, self)
+        self.data.draw(r)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -129,7 +152,7 @@ class CustomerWindow(object):
         self.backButton.setText(_translate("MainWindow", "Back"))
         self.newCustomerButton.setText(_translate("MainWindow", "New Customer"))
         self.editCustomerButton.setText(_translate("MainWindow", "Edit Customer"))
-        self.generateReceiptButton.setText(_translate("MainWindow", "Generate Receipt"))
+        self.generateReceiptButton.setText(_translate("MainWindow", "Receipts" if self.receipt_mode else "Generate Receipt"))
 
     def gen_receipt(self):
         if not self.selected_row:
@@ -139,6 +162,7 @@ class CustomerWindow(object):
         customer = logic.customer.Customer(id, name, address, ph_num)
         receipt = receiptWindowGui.ReceiptWindow(self.data, customer)
         self.data.draw(receipt)
+
     def search(self):
         key = self.search_key.text().strip()
         model = self.customersTable.model()
@@ -149,7 +173,6 @@ class CustomerWindow(object):
             self.data.db.connect()
         model.change_data(logic.customer.Customer.fetch(self.data.db, key, self.is_ph.isChecked()))
         self.data.db.disconnect()
-
 
     def activate_search(self):
         txt = self.search_key.text()
@@ -174,7 +197,6 @@ class CustomerWindow(object):
         self.generateReceiptButton.setEnabled(False)
         self.editCustomerButton.setStyleSheet(get_opacity(0.5))
 
-
     def row_selected(self, selected, deselected):
         self.selected_row = selected.indexes()
         if not self.selected_row:
@@ -191,3 +213,8 @@ class CustomerWindow(object):
 
         edit_window = addCustomerWindowGui.AddCustomer(self.data, customer)
         self.data.draw(edit_window)
+
+
+    def mimic_push(self):
+        self.activate_search()
+        self.searchButton.click()

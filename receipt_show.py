@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os.path
 from functools import reduce
 
 # Form implementation generated from reading ui file 'GUI\receiptsShow.ui'
@@ -72,7 +73,7 @@ class ReciptShow(object):
         self.selected = []
         self.customersTable.selectionModel().selectionChanged.connect(self.row_selected)
         self.backButton.clicked.connect(lambda: self.data.draw(self.prev))
-        self.open.clicked.connect(self.gen_pdf)
+        self.open.clicked.connect(lambda : self.gen_pdf(self.selected.pop()))
         self.retranslateUi(ReciptWindow)
         QtCore.QMetaObject.connectSlotsByName(ReciptWindow)
 
@@ -87,8 +88,7 @@ class ReciptShow(object):
 
         self.open.repaint()
 
-    def gen_pdf(self):
-        i = self.selected.pop()
+    def gen_pdf(self, i):
         rec_id, name, ph, address, total, date = self.customersTable.model().get_item(i)
         cust = customer.Customer(None, name, address, ph)
         j = 0
@@ -100,7 +100,8 @@ class ReciptShow(object):
         records = sales.Sales.fetch(rec_id, self.data.db)
         self.data.db.disconnect()
         total = round(sum(x[6] for x in records),2)
-        pdf.generate_receipt(rec_id, rec_id, cust, records, str(total), True, date)
+        path = os.path.join(self.data.receipts_path, rec_id)
+        pdf.generate_receipt(str(path), rec_id, cust, records, str(total), True, date)
 
     def retranslateUi(self, ReciptWindow):
         _translate = QtCore.QCoreApplication.translate

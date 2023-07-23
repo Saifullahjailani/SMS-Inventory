@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import os
 
 # Form implementation generated from reading ui file 'GUI\reciptIDSearch.ui'
 #
@@ -12,8 +13,10 @@ import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 import stylesheet
 import logic.sales as sales
+from customerGui import CustomerWindow
+from logic import customer
 from receipt_show import ReciptShow
-
+import logic.generate_pdf as pdf
 
 class ReceiptIDSearch(object):
     def __init__(self, data):
@@ -103,9 +106,14 @@ class ReceiptIDSearch(object):
         if self.by_receipt_id.isChecked():
             self.receipt_id_call_back()
         elif self.by_customer.isChecked():
-            pass
+            self.customer_call_back()
         else:
             self.current_date_call_back()
+
+    def customer_call_back(self):
+        name = self.key.text()
+        c = CustomerWindow(self.data, True, name.strip())
+        self.data.draw(c)
 
     def current_date_call_back(self):
         current_date = self.calendarWidget.selectedDate().toPyDate()
@@ -122,10 +130,18 @@ class ReceiptIDSearch(object):
     def receipt_id_call_back(self):
         while not self.data.db.connect():
             self.data.db.connect()
-        records = sales.Sales.fetch(self.key.text(), self.data.db)
-        self.data.db.disconnect()
+        meta = sales.Sales.fetch_meta(self.key.text(), self.data.db)
+        if meta:
+            rec_id, name, ph, address, total, date = meta.pop()
+            cust = customer.Customer(None, name, address, ph)
+            records = sales.Sales.fetch(rec_id, self.data.db)
+            self.data.db.disconnect()
+            path = os.path.join(self.data.receipts_path, rec_id)
+            pdf.generate_receipt(str(path), rec_id, cust, records, str(round(float(total), 2)), True, date)
+        else:
+            self.data.db.disconnect()
 
-        print(records)
+
 
     def by_receipt_id_call_back(self):
         _translate = QtCore.QCoreApplication.translate
@@ -141,7 +157,7 @@ class ReceiptIDSearch(object):
         _translate = QtCore.QCoreApplication.translate
         self.calendarWidget.setHidden(True)
         self.key.setHidden(False)
-        self.key.setPlaceholderText(_translate("MainWindow", "Enter the customer name: "))
+        self.key.setPlaceholderText(_translate("MainWindow", "Enter the customer phone number: "))
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

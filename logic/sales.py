@@ -42,6 +42,47 @@ class Sales:
             """
         return db.fetchall(query, receiptID)
 
+    def fetch_with_customer(customer_id, db) -> list:
+        query = """
+            SELECT 
+                s.receipt_id,
+                c.name,
+                c.ph_num,
+                c.address,
+                SUM(s.discounted_price),
+                TO_CHAR(s.date_sold, 'Mon-DD-YYYY') AS sold_by
+            FROM 
+                sales AS s
+            JOIN 
+                customers c on customer_id=c.id
+            WHERE
+                customer_id = %s
+            GROUP BY 
+                s.receipt_id, c.name, c.ph_num, c.address, sold_by
+            """
+        return db.fetchall(query, customer_id)
+    def fetch_meta(receiptID:str, db) -> list:
+        query = """
+            SELECT 
+                s.receipt_id,
+                c.name,
+                c.ph_num,
+                c.address,
+                SUM(s.discounted_price),
+                TO_CHAR(s.date_sold, 'Mon-DD-YYYY') AS sold_by
+            FROM 
+                sales AS s
+            JOIN 
+                customers c on customer_id=c.id
+            WHERE
+                receipt_id = %s
+            GROUP BY 
+                s.receipt_id, c.name, c.ph_num, c.address, sold_by
+            ORDER BY 
+                c.name
+        """
+        return db.fetchall(query, receiptID)
+
     def fetch_by_date(start_date:datetime, end_date:datetime, db):
         start_date_str = start_date.strftime('%Y-%m-%d %H:%M:%S')
         end_date_str = end_date.strftime('%Y-%m-%d %H:%M:%S')

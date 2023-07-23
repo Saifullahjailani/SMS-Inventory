@@ -9,6 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+import logic.db
+import main
 import stylesheet
 from receipt_id_search import ReceiptIDSearch
 class HomeWindow(object):
@@ -92,7 +95,12 @@ class HomeWindow(object):
         self.actionReceipt.triggered.connect(lambda : self.data.draw(receipt_id_search))
         self.receipt_button.clicked.connect(lambda : self.data.draw(receipt_id_search))
         self.actionQuit.triggered.connect(lambda : self.data.exit())
-        
+        self.actionconfig.triggered.connect(self.re_configure)
+
+    def re_configure(self):
+        config = main.show_config()
+        self.data.db = logic.db.DB(config.db_name, config.db_user, config.db_password, config.db_host, config.db_port)
+        self.data.receipts_path = config.receipts_dir
     def retranslateUi(self, HomeWindow):
         _translate = QtCore.QCoreApplication.translate
         HomeWindow.setWindowTitle(_translate("HomeWindow", "MainWindow"))
