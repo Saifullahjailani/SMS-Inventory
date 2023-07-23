@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QDoubleValidator
-
+import stylesheet as st
 import logic.product
 
 
@@ -21,7 +21,7 @@ class AddProduct(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(753, 337)
+        MainWindow.setFixedSize(753, 337)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.id = QtWidgets.QLineEdit(self.centralwidget)
@@ -29,14 +29,7 @@ class AddProduct(object):
         font = QtGui.QFont()
         font.setPointSize(-1)
         self.id.setFont(font)
-        self.id.setStyleSheet("QLineEdit {\n"
-                              "    background-color: #FFFFFF; /* Set the background color */\n"
-                              "    border: 2px solid #555555; /* Set the border style */\n"
-                              "    border-radius: 5px; /* Set the border radius */\n"
-                              "    padding: 5px; /* Set the padding */\n"
-                              "    color: #000000; /* Set the text color */\n"
-                              "    font-size: 12px; /* Set the font size */\n"
-                              "}")
+        self.id.setStyleSheet(st.TEXT_BOX_STYLE)
         self.id.setText("")
         self.id.setObjectName("id")
         self.name_2 = QtWidgets.QLineEdit(self.centralwidget)
@@ -44,14 +37,7 @@ class AddProduct(object):
         font = QtGui.QFont()
         font.setPointSize(-1)
         self.name_2.setFont(font)
-        self.name_2.setStyleSheet("QLineEdit {\n"
-                                  "    background-color: #FFFFFF; /* Set the background color */\n"
-                                  "    border: 2px solid #555555; /* Set the border style */\n"
-                                  "    border-radius: 5px; /* Set the border radius */\n"
-                                  "    padding: 5px; /* Set the padding */\n"
-                                  "    color: #000000; /* Set the text color */\n"
-                                  "    font-size: 12px; /* Set the font size */\n"
-                                  "}")
+        self.name_2.setStyleSheet(st.TEXT_BOX_STYLE)
         self.name_2.setText("")
         self.name_2.setObjectName("name_2")
         self.backButton = QtWidgets.QPushButton(self.centralwidget)
@@ -59,21 +45,7 @@ class AddProduct(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.backButton.setFont(font)
-        self.backButton.setStyleSheet("QPushButton {\n"
-                                      "    background-color: #4d4d4d;\n"
-                                      "    color: #ffffff;\n"
-                                      "    padding: 8px 16px;\n"
-                                      "    border-radius: 20px;\n"
-                                      "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n"
-                                      "}\n"
-                                      "\n"
-                                      "QPushButton:hover {\n"
-                                      "    background-color: #595959;\n"
-                                      "}\n"
-                                      "\n"
-                                      "QPushButton:pressed {\n"
-                                      "    background-color: #3d3d3d;\n"
-                                      "}")
+        self.backButton.setStyleSheet(st.BUTTON_STYLE)
         self.backButton.setObjectName("backButton")
         self.backButton.clicked.connect(lambda: self.data.draw(self.data.productsWindow))
         self.addProductButton = QtWidgets.QPushButton(self.centralwidget)
@@ -81,21 +53,7 @@ class AddProduct(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.addProductButton.setFont(font)
-        self.addProductButton.setStyleSheet("QPushButton {\n"
-                                            "    background-color: #4d4d4d;\n"
-                                            "    color: #ffffff;\n"
-                                            "    padding: 8px 16px;\n"
-                                            "    border-radius: 20px;\n"
-                                            "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n"
-                                            "}\n"
-                                            "\n"
-                                            "QPushButton:hover {\n"
-                                            "    background-color: #595959;\n"
-                                            "}\n"
-                                            "\n"
-                                            "QPushButton:pressed {\n"
-                                            "    background-color: #3d3d3d;\n"
-                                            "}")
+        self.addProductButton.setStyleSheet(st.BUTTON_STYLE)
         self.addProductButton.setObjectName("addProductButton")
         self.addProductButton.clicked.connect(lambda: self.add_product())
         self.price = QtWidgets.QLineEdit(self.centralwidget)
@@ -103,14 +61,7 @@ class AddProduct(object):
         font = QtGui.QFont()
         font.setPointSize(-1)
         self.price.setFont(font)
-        self.price.setStyleSheet("QLineEdit {\n"
-                                 "    background-color: #FFFFFF; /* Set the background color */\n"
-                                 "    border: 2px solid #555555; /* Set the border style */\n"
-                                 "    border-radius: 5px; /* Set the border radius */\n"
-                                 "    padding: 5px; /* Set the padding */\n"
-                                 "    color: #000000; /* Set the text color */\n"
-                                 "    font-size: 12px; /* Set the font size */\n"
-                                 "}")
+        self.price.setStyleSheet(st.TEXT_BOX_STYLE)
         validator = QDoubleValidator()
         validator.setDecimals(2)  # Set the number of decimal places
         self.price.setValidator(validator)

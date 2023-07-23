@@ -28,7 +28,7 @@ class CustomerWindow(object):
         self.key = key
     def setupUi(self, MainWindow, logic=None):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 597)
+        MainWindow.setFixedSize(800, 597)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.customersTable = QtWidgets.QTableView(self.centralwidget)

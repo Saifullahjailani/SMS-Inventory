@@ -21,7 +21,7 @@ class HomeWindow(object):
 
     def setupUi(self, HomeWindow):
         HomeWindow.setObjectName("SMS Book Keeping System")
-        HomeWindow.resize(800, 597)
+        HomeWindow.setFixedSize(800, 597)
         self.centralwidget = QtWidgets.QWidget(HomeWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -100,9 +100,10 @@ class HomeWindow(object):
         self.actionAbout.triggered.connect(self.about)
 
     def about(self):
-        window = copyright.LicenseDialog()
+        window = copyright.LicenseDialog(self.data.window)
         window.show()
         window.exec_()
+        window.dialog_shown = True
 
 
     def re_configure(self):

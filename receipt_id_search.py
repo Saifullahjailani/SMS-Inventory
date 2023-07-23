@@ -24,7 +24,7 @@ class ReceiptIDSearch(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(809, 496)
+        MainWindow.setFixedSize(809, 496)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.backButton = QtWidgets.QPushButton(self.centralwidget)

@@ -51,7 +51,7 @@ class Dialog(QtWidgets.QDialog):
         self.setObjectName("Application Configuration Menu")
         self.setWindowTitle("Configuration")
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint )
-        self.resize(400, 300)
+        self.setFixedSize(400, 300)
         self.setAutoFillBackground(False)
         self.setSizeGripEnabled(True)
         buttonBox = QtWidgets.QDialogButtonBox(self)

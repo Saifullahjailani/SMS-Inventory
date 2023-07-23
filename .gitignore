@@ -1,0 +1,9 @@
+# Do not add config file
+config.ini
+build/
+*.exe
+*.dll
+*.pyd
+.idea/
+__pycache__/
+

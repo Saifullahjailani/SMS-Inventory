@@ -10,31 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import logic.customer
-
-BUTTON_STYLE = "QPushButton {\n" \
-               + "    background-color: #4d4d4d;\n" \
-               + "    color: #ffffff;\n" \
-               + "    padding: 8px 16px;\n" \
-               + "    border-radius: 20px;\n" \
-               + "    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);\n" \
-               + "}\n" \
-               + "\n" \
-               + "QPushButton:hover {\n" \
-               + "    background-color: #595959;\n" \
-               + "}\n" \
-               + "\n" \
-               + "QPushButton:pressed {\n" \
-               + "    background-color: #3d3d3d;\n" \
-               + "}"
-
-TEXT_BOX_STYLE = "QLineEdit {\n" \
-                 + "    background-color: #ffffff; /* Set the background color */\n" \
-                 + "    border: 2px solid #555555; /* Set the border style */\n" \
-                 + "    border-radius: 5px; /* Set the border radius */\n" \
-                 + "    padding: 5px; /* Set the padding */\n" \
-                 + "    color: #000000; /* Set the text color */\n" \
-                 + "    font-size: 12px; /* Set the font size */\n" \
-                 + "}"
+from stylesheet import *
 
 
 class AddCustomer(object):
@@ -44,7 +20,7 @@ class AddCustomer(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(809, 597)
+        MainWindow.setFixedSize(809, 597)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.name = QtWidgets.QLineEdit(self.centralwidget)
@@ -125,7 +101,7 @@ class AddCustomer(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Add Customer"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Add Customer" if self.customer.is_empty() else "Edit Customer"))
         self.name.setPlaceholderText(_translate("MainWindow", "Enter the name   -   اسم مشتری"))
         self.backButton.setText(_translate("MainWindow", "Back"))
         btn_name = "Add Customer" if self.customer.is_empty() else "Edit Customer"

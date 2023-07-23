@@ -26,7 +26,7 @@ class ReciptShow(object):
 
     def setupUi(self, ReciptWindow):
         ReciptWindow.setObjectName("ReciptWindow")
-        ReciptWindow.resize(1133, 866)
+        ReciptWindow.setFixedSize(1133, 866)
         self.centralwidget = QtWidgets.QWidget(ReciptWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.customersTable = QtWidgets.QTableView(self.centralwidget)

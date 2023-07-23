@@ -22,9 +22,11 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 
 
 class LicenseDialog(QDialog):
-    def __init__(self):
-        super().__init__(flags=Qt.WindowCloseButtonHint | Qt.WindowTitleHint)
-        self.setWindowTitle("MIT Open Source License Viewer")
+    def __init__(self, parent=None):
+        super().__init__(parent,flags=Qt.WindowCloseButtonHint | Qt.WindowTitleHint | Qt.WindowModal)
+        self.dialog_shown = False
+        self.setWindowTitle("About")
+        self.setMinimumSize(600,300)
         layout = QVBoxLayout(self)
 
         text_edit = QTextEdit(self)
@@ -32,7 +34,6 @@ class LicenseDialog(QDialog):
         text_edit.setHtml(license_text)
 
         layout.addWidget(text_edit)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
