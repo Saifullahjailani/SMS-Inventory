@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QTextEdit
 
 # License text (replace this with the MIT license text if you have it)
 license_text = """
-<b>MIT License</b><br><br>
+<b>License</b><br><br>
 
-Copyright (c) [year] [author]<br><br>
+Copyright (c) 2023 Saifullah Jailani<br><br>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
