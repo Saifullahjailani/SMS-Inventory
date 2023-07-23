@@ -1,4 +1,8 @@
+import os.path
 import sys
+
+from PyQt5.QtGui import QIcon
+
 import logic.config as config
 import config_ui
 import logic.db
@@ -51,6 +55,9 @@ def show_config():
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
+    assets = os.path.join(os.getcwd(),'assets')
+    icon = QIcon(os.path.join(assets, 'logo.ico'))
+    app.setWindowIcon(icon)
     config = conf.read()
     while config is None:
         config = show_config()

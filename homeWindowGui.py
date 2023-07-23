@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import copyright
 import logic.db
 import main
 import stylesheet
@@ -96,6 +97,13 @@ class HomeWindow(object):
         self.receipt_button.clicked.connect(lambda : self.data.draw(receipt_id_search))
         self.actionQuit.triggered.connect(lambda : self.data.exit())
         self.actionconfig.triggered.connect(self.re_configure)
+        self.actionAbout.triggered.connect(self.about)
+
+    def about(self):
+        window = copyright.LicenseDialog()
+        window.show()
+        window.exec_()
+
 
     def re_configure(self):
         config = main.show_config()
@@ -103,7 +111,7 @@ class HomeWindow(object):
         self.data.receipts_path = config.receipts_dir
     def retranslateUi(self, HomeWindow):
         _translate = QtCore.QCoreApplication.translate
-        HomeWindow.setWindowTitle(_translate("HomeWindow", "MainWindow"))
+        HomeWindow.setWindowTitle(_translate("HomeWindow", "SMS"))
         self.label.setText(_translate("HomeWindow", "SMS Book Keeping System"))
         self.sellButton.setText(_translate("HomeWindow", "Sell - فروش"))
         self.receipt_button.setText(_translate("HomeWindow", "Receipt"))

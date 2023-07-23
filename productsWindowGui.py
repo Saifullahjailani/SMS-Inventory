@@ -113,7 +113,7 @@ class ProductsWindow(object):
 
     def retranslateUi(self, productsWindow):
         _translate = QtCore.QCoreApplication.translate
-        productsWindow.setWindowTitle(_translate("productsWindow", "MainWindow"))
+        productsWindow.setWindowTitle(_translate("productsWindow", "Products"))
         self.backButton.setText(_translate("productsWindow", "Back"))
         self.addButton.setText(_translate("productsWindow", "Add"))
 
