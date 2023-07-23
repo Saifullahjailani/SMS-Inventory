@@ -13,58 +13,9 @@ import addCustomerWindowGui
 import logic.customer
 import receiptWindowGui
 from tableModel import CustomTableModel
-
-TABLE_STYLE = "QTableWidget::item {\n" \
-              + "    background-color: #f0f0f0; /* Set the default background color for table items */\n" \
-              + "}\n" \
-              + "\n" \
-              + "QTableWidget::item:nth-child(even) {\n" \
-              + "    background-color: #ffffff; /* Set the background color for even rows */\n" \
-              + "}\n" \
-              + "\n" \
-              + "QTableWidget::item:hover {\n" \
-              + "    background-color: #c0c0c0; /* Set the background color for hovered items */\n" \
-              + "}"
-
-TEXT_BOX_STYLE = "QLineEdit {\n" \
-                 + "    background-color: #ffffff; /* Set the background color */\n" \
-                 + "    border: 2px solid #555555; /* Set the border style */\n" \
-                 + "    border-radius: 5px; /* Set the border radius */\n" \
-                 + "    padding: 5px; /* Set the padding */\n" \
-                 + "    color: #000000; /* Set the text color */\n" \
-                 + "    font-size: 12px; /* Set the font size */\n" \
-                 + "}"
-BUTTON_STYLE = "QPushButton {\n" \
-               + "    background-color: #4d4d4d;\n" \
-               + "    color: #ffffff;\n" \
-               + "    padding: 8px 16px;\n" \
-               + "    border-radius: 20px;\n" \
-               + "}\n" \
-               + "\n" \
-               + "QPushButton:hover {\n" \
-               + "    background-color: #595959;\n" \
-               + "}\n" \
-               + "\n" \
-               + "QPushButton:pressed {\n" \
-               + "    background-color: #3d3d3d;\n" \
-               + "}"
+from stylesheet import *
 
 
-def get_opacity(opacity):
-    return "QPushButton {\n" \
-        + f"    background-color: rgba(77, 77, 77, {opacity});\n" \
-        + "    color: #ffffff;\n" \
-        + "    padding: 8px 16px;\n" \
-        + "    border-radius: 20px;\n" \
-        + "}\n" \
-        + "\n" \
-        + "QPushButton:hover {\n" \
-        + "    background-color: #595959;\n" \
-        + "}\n" \
-        + "\n" \
-        + "QPushButton:pressed {\n" \
-        + "    background-color: #3d3d3d;\n" \
-        + "}"
 class CustomerWindow(object):
     def __init__(self, data):
         self.data = data
@@ -226,7 +177,7 @@ class CustomerWindow(object):
 
     def row_selected(self, selected, deselected):
         self.selected_row = selected.indexes()
-        if self.selected_row == []:
+        if not self.selected_row:
             self.deactivate_selection_button()
         else:
             self.activate_selection_button()

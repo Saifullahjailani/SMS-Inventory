@@ -1,3 +1,4 @@
+import datetime
 class Sales:
     def __init__(self, id, receipt_id, quantity, product_id, customer_id, discount=0, discounted_price=0, db=None):
         self.discounted_price = discounted_price
@@ -22,6 +23,46 @@ class Sales:
         query = f"UPDATE sales SET quantity = {quantity}WHERE receipt_id = {self.receipt_id} AND product_id = {self.product_id};"
         return self.db.exec(quantity)
     
-    def fetch(self, receiptID):
-        query = "SELECT * FROM sales WHERE receipt_id = %s;"
-        return self.db.fetchall(query, receiptID)
+    def fetch(receiptID:str, db) -> list:
+        query = """
+            SELECT 
+                p.id,
+                p.name, 
+                p.price, 
+                s.quantity,
+                s.discount, 
+                s.discounted_price,
+                s.discounted_price * s.quantity
+            FROM 
+                sales AS s
+            JOIN
+                products p ON p.id=s.product_id
+            WHERE 
+                receipt_id = %s;
+            """
+        return db.fetchall(query, receiptID)
+
+    def fetch_by_date(start_date:datetime, end_date:datetime, db):
+        start_date_str = start_date.strftime('%Y-%m-%d %H:%M:%S')
+        end_date_str = end_date.strftime('%Y-%m-%d %H:%M:%S')
+        query = """
+            SELECT 
+                s.receipt_id,
+                c.name,
+                c.ph_num,
+                c.address,
+                SUM(s.discounted_price),
+                TO_CHAR(s.date_sold, 'Mon-DD-YYYY') AS sold_by
+            FROM 
+                sales AS s
+            JOIN 
+                customers c on customer_id=c.id
+            WHERE
+                date_sold BETWEEN %s AND %s
+            GROUP BY 
+                s.receipt_id, c.name, c.ph_num, c.address, sold_by
+            ORDER BY 
+                c.name
+        """
+
+        return db.fetchall(query, start_date_str, end_date_str)

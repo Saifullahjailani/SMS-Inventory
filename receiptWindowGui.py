@@ -340,6 +340,5 @@ class ReceiptWindow(object):
             record.sell()
         self.data.db.commit()
         self.data.db.disconnect()
-        generate_receipt('receipt.pdf', self.id, self.customer, self.customersTable.model()._data,
-                         self.rawTotal.text(), self.discountedTotal.text(), True)
-
+        generate_receipt('receipt.pdf', self.id.hex, self.customer, self.customersTable.model()._data,self.rawTotal.text(), True)
+        self.data.draw(self.data.homeWindow)

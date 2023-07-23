@@ -9,7 +9,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+import stylesheet
+from receipt_id_search import ReceiptIDSearch
 class HomeWindow(object):
     def __init__(self, data):
         self.data = data
@@ -36,43 +37,16 @@ class HomeWindow(object):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.sellButton.setFont(font)
-        self.sellButton.setStyleSheet("QPushButton {\n"
-"    background-color: #4d4d4d;\n"
-"    color: #ffffff;\n"
-"    padding: 8px 16px;\n"
-"    border-radius: 20px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #595959;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #3d3d3d;\n"
-"}")
+        self.sellButton.setStyleSheet(stylesheet.BUTTON_STYLE)
         self.sellButton.setObjectName("sellButton")
         self.verticalLayout_2.addWidget(self.sellButton)
-        self.InvoiceButton = QtWidgets.QPushButton(self.widget)
+        self.receipt_button = QtWidgets.QPushButton(self.widget)
         font = QtGui.QFont()
         font.setPointSize(16)
-        self.InvoiceButton.setFont(font)
-        self.InvoiceButton.setStyleSheet("QPushButton {\n"
-"    background-color: #4d4d4d;\n"
-"    color: #ffffff;\n"
-"    padding: 8px 16px;\n"
-"    border-radius: 20px;\n"
-"\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-color: #595959;\n"
-"}\n"
-"\n"
-"QPushButton:pressed {\n"
-"    background-color: #3d3d3d;\n"
-"}")
-        self.InvoiceButton.setObjectName("InvoiceButton")
-        self.verticalLayout_2.addWidget(self.InvoiceButton)
+        self.receipt_button.setFont(font)
+        self.receipt_button.setStyleSheet(stylesheet.BUTTON_STYLE)
+        self.receipt_button.setObjectName("InvoiceButton")
+        self.verticalLayout_2.addWidget(self.receipt_button)
         HomeWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(HomeWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -85,8 +59,6 @@ class HomeWindow(object):
         HomeWindow.setStatusBar(self.statusbar)
         self.actionSell = QtWidgets.QAction(HomeWindow)
         self.actionSell.setObjectName("actionSell")
-        self.actionInvoice = QtWidgets.QAction(HomeWindow)
-        self.actionInvoice.setObjectName("actionInvoice")
         self.actionReceipt = QtWidgets.QAction(HomeWindow)
         self.actionReceipt.setObjectName("actionReceipt")
         self.actionconfig = QtWidgets.QAction(HomeWindow)
@@ -100,7 +72,6 @@ class HomeWindow(object):
         self.actionProduct.setObjectName("actionProduct")
 
         self.menuMore.addAction(self.actionSell)
-        self.menuMore.addAction(self.actionInvoice)
         self.menuMore.addAction(self.actionReceipt)
         self.menuMore.addAction(self.actionProduct)
         self.menuMore.addSeparator()
@@ -116,15 +87,20 @@ class HomeWindow(object):
         self.actionSell.triggered.connect(lambda: self.data.draw(self.data.customerWindow))
         self.sellButton.clicked.connect(lambda: self.data.draw(self.data.customerWindow))
         self.actionProduct.triggered.connect(lambda: self.data.draw(self.data.productsWindow))
+
+        receipt_id_search = ReceiptIDSearch(self.data)
+        self.actionReceipt.triggered.connect(lambda : self.data.draw(receipt_id_search))
+        self.receipt_button.clicked.connect(lambda : self.data.draw(receipt_id_search))
+        self.actionQuit.triggered.connect(lambda : self.data.exit())
+        
     def retranslateUi(self, HomeWindow):
         _translate = QtCore.QCoreApplication.translate
         HomeWindow.setWindowTitle(_translate("HomeWindow", "MainWindow"))
         self.label.setText(_translate("HomeWindow", "SMS Book Keeping System"))
         self.sellButton.setText(_translate("HomeWindow", "Sell - فروش"))
-        self.InvoiceButton.setText(_translate("HomeWindow", "Invoice - انوایس"))
+        self.receipt_button.setText(_translate("HomeWindow", "Receipt"))
         self.menuMore.setTitle(_translate("HomeWindow", "More"))
         self.actionSell.setText(_translate("HomeWindow", "Sell"))
-        self.actionInvoice.setText(_translate("HomeWindow", "Invoices"))
         self.actionReceipt.setText(_translate("HomeWindow", "Receipts"))
         self.actionProduct.setText(_translate("HomeWindow", "Products"))
         self.actionconfig.setText(_translate("HomeWindow", "Config"))
